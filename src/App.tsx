@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { useAuth, useNotes } from '@/services/hooks';
 import { NoteList } from '@/components/NoteList';
 import { NoteEditor } from '@/components/NoteEditor';
+import { Home } from '@/components/Home';
+import { TasksView } from '@/components/TasksView';
+import { Sidebar } from '@/components/Sidebar';
+import { NewNote } from '@/components/NewNote';
 
 export default function App() {
   const { user, signInAnonymously } = useAuth();
@@ -31,38 +35,25 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="app">
-        <Routes>
-          <Route
-            path="/"
-            element={
+      <div className="layout">
+        <Sidebar categories={categories} activeCategory={filter} onSelectCategory={setFilter} />
+        <main className="content">
+          <Routes>
+            <Route path="/" element={<Home notes={notes} />} />
+            <Route path="/notes" element={
               <>
-                <header>
-                  <h1>SyncNote</h1>
-                  <div className="filters">
-                    <select value={filter} onChange={(e) => setFilter(e.target.value as any)}>
-                      <option value="all">Todas</option>
-                      {categories.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
-                </header>
-                <section className="create-note">
-                  <input placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
-                  <input placeholder="Categoría" value={category} onChange={(e) => setCategory(e.target.value)} list="categories" />
-                  <datalist id="categories">
-                    {categories.map((c) => (<option key={c} value={c} />))}
-                  </datalist>
-                  <textarea placeholder="Contenido" value={content} onChange={(e) => setContent(e.target.value)} />
-                  <button onClick={handleCreate}>Agregar</button>
-                </section>
+                <div className="toolbar">
+                  <Link to="/notes/new" className="primary">Nueva nota</Link>
+                </div>
                 <NoteList notes={visibleNotes} />
               </>
-            }
-          />
-          <Route path="/note/:id" element={<NoteEditor />} />
-        </Routes>
+            } />
+            <Route path="/notes/new" element={<NewNote categories={categories} />} />
+            <Route path="/tasks" element={<TasksView />} />
+            <Route path="/note/:id" element={<NoteEditor />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
       </div>
     </BrowserRouter>
   );

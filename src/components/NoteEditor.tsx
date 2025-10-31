@@ -33,7 +33,8 @@ export function NoteEditor() {
         <button onClick={() => navigate('/')}>←</button>
         <h2>Editar nota</h2>
         <div className="spacer" />
-        <button onClick={() => deleteNote(note.id!).then(() => navigate('/'))}>Eliminar</button>
+  <button onClick={() => updateNote(note.id!, { pinned: !note.pinned })}>{note.pinned ? 'Desfijar' : 'Fijar'}</button>
+  <button onClick={() => deleteNote(note.id!).then(() => navigate('/'))}>Eliminar</button>
       </div>
 
       <input className="editor-title" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -45,26 +46,29 @@ export function NoteEditor() {
         <h3>Tareas</h3>
         <ul>
           {note.tasks?.map((t) => (
-            <li key={t.id}>
+            <li key={t.id} className="task-row">
               <label>
                 <input type="checkbox" checked={t.done} onChange={() => toggleTask(note.id!, t.id!, !t.done)} />
                 <span className={t.done ? 'done' : ''}>{t.title}</span>
               </label>
+              {t.dueDate && <small className="muted">vence {new Date(t.dueDate).toLocaleDateString()}</small>}
             </li>
           ))}
         </ul>
-        <AddTask onAdd={(txt) => addTask(note.id!, txt)} />
+        <AddTask onAdd={(data) => addTask(note.id!, data.title, data.dueDate)} />
       </div>
     </div>
   );
 }
 
-function AddTask({ onAdd }: { onAdd: (t: string) => void }) {
+function AddTask({ onAdd }: { onAdd: (t: { title: string; dueDate?: number | null }) => void }) {
   const [text, setText] = useState('');
+  const [due, setDue] = useState<string>('');
   return (
     <div className="add-task">
       <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Nueva tarea" />
-      <button onClick={() => { if (text.trim()) { onAdd(text.trim()); setText(''); } }}>Añadir</button>
+      <input type="date" value={due} onChange={(e)=>setDue(e.target.value)} />
+      <button onClick={() => { if (text.trim()) { onAdd({ title: text.trim(), dueDate: due ? new Date(due).getTime() : null }); setText(''); setDue(''); } }}>Añadir</button>
     </div>
   );
 }

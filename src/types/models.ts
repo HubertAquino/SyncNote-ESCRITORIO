@@ -6,6 +6,7 @@ export type Task = {
   done: boolean;
   createdAt: number;
   updatedAt: number;
+  dueDate?: number | null;
 };
 
 export type Note = {
@@ -15,5 +16,6 @@ export type Note = {
   category: string;
   createdAt: number;
   updatedAt: number;
+  pinned?: boolean;
   tasks?: Task[];
 };

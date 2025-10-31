@@ -99,6 +99,7 @@ export function useNotes(uid?: string) {
       title: input.title,
       content: input.content,
       category: input.category || 'General',
+      pinned: false,
       createdAt: now,
       updatedAt: now,
     });
@@ -119,7 +120,7 @@ export function useNotes(uid?: string) {
     await deleteDoc(noteRef);
   }, [uid]);
 
-  const addTask = useCallback(async (noteId: string, title: string) => {
+  const addTask = useCallback(async (noteId: string, title: string, dueDate?: number | null) => {
     if (!uid && ROOT_MODE === 'user') return;
     const now = Date.now();
     await addDoc(collection(db, ...buildTasksPath(uid!, noteId)), {
@@ -127,6 +128,7 @@ export function useNotes(uid?: string) {
       done: false,
       createdAt: now,
       updatedAt: now,
+      dueDate: dueDate ?? null,
     });
   }, [uid]);
 
